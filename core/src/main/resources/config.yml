@@ -1,0 +1,116 @@
+# jev-guard: AI chat moderation powered by TypeSafe's Jev model.
+# Docs for the model: https://docs.typesafe.ai
+
+api:
+  # typesafe   - call TypeSafe's API directly (needs a TypeSafe API key)
+  # cloudflare - call Jev on Cloudflare through AI Gateway (logs, analytics, caching,
+  #              rate limits; billed to your Cloudflare account)
+  provider: typesafe
+
+  typesafe:
+    # Prefer the TYPESAFE_API_KEY environment variable; it overrides this value.
+    key: ""
+    base-url: "https://api.typesafe.ai"
+    model: "jev-latest"
+
+  cloudflare:
+    # Prefer the CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN environment variables.
+    # The token needs the Account > Workers AI > Read permission.
+    account-id: ""
+    api-token: ""
+    # AI Gateway to route through. Empty = your account's default gateway.
+    gateway-id: ""
+    model: "typesafe/jev"
+
+  timeout-ms: 4000
+  max-retries: 2
+
+# shadow  - log verdicts only; nothing is blocked or punished. Start here and tune thresholds.
+# deliver - messages appear at once; actions run when the verdict arrives (~0.5s later).
+#           The "cancel" action has no effect in this mode.
+# hold    - messages wait for the verdict (up to hold.timeout-ms). Flagged messages with the
+#           "cancel" action never appear. Players feel a short delay.
+mode: shadow
+
+hold:
+  timeout-ms: 1500
+
+# What happens in hold mode when the API is slow or down:
+#   allow - deliver the message anyway (recommended)
+#   block - cancel the message and send messages.unavailable
+on-error: allow
+
+# Pause API calls after this many failed requests in a row.
+circuit-breaker:
+  failures: 5
+  cooldown-seconds: 30
+
+# Messages are grouped into one API request. Bigger batches cost less but each
+# message waits longer, and very large batches can reduce accuracy.
+batching:
+  max-size: 8
+  max-wait-ms: 150
+
+min-message-length: 2
+
+privacy:
+  # Only the message text is sent to TypeSafe; no player names or UUIDs.
+  # This controls whether flagged message text is written to the server log.
+  log-message-content: true
+
+# A flagged message with a top category probability >= this (but below the category's
+# threshold) is sent to staff with jevguard.notify for review. No other action runs.
+review-threshold: 0.5
+
+safe-description: "Ordinary game chat, including banter, trash talk about gameplay, mild swearing, and jokes that do not target anyone."
+
+# Each category is a Jev Choice option. Write descriptions literally and precisely:
+# Jev answers the words you write, not what you meant.
+#
+# Actions:
+#   cancel               - hide the message (hold mode only). Staff with jevguard.notify
+#                          always get messages.staff-blocked when a message is hidden.
+#   warn                 - send messages.warn to the player
+#   notify-staff         - send messages.staff-flag to players with jevguard.notify
+#                          (skipped when the message was blocked; staff-blocked is sent instead)
+#   kick                 - kick with messages.kick
+#   command: <command>   - run as console; placeholders {player} {uuid} {category}
+#                          e.g. "command: mute {player} 10m Auto: {category}"
+categories:
+  harassment:
+    description: "Insults, threats, or bullying aimed at a specific player or group."
+    threshold: 0.8
+    actions: [cancel, warn, notify-staff]
+  hate:
+    description: "Slurs or attacks on people because of race, ethnicity, religion, gender, sexual orientation, disability, or nationality."
+    threshold: 0.75
+    actions: [cancel, warn, notify-staff]
+  sexual:
+    description: "Sexual content or sexual comments about other players."
+    threshold: 0.8
+    actions: [cancel, warn, notify-staff]
+  grooming:
+    description: "An attempt to move a player to a private platform, ask for their age, address, photos, or personal details, or build a secret relationship."
+    threshold: 0.6
+    actions: [cancel, notify-staff]
+  self-harm:
+    description: "The sender says they may hurt or kill themselves."
+    threshold: 0.6
+    actions: [notify-staff]
+  doxxing:
+    description: "Sharing someone's real name, address, phone number, school, or other private information."
+    threshold: 0.7
+    actions: [cancel, notify-staff]
+  scam:
+    description: "Phishing links, fake giveaways, or requests for account passwords or payment."
+    threshold: 0.8
+    actions: [cancel, warn, notify-staff]
+
+# MiniMessage format. Placeholders: <player> <message> <category> <probability>
+messages:
+  warn: "<red>Your message was blocked by chat moderation (<category>).</red>"
+  kick: "<red>Removed by chat moderation (<category>).</red>"
+  unavailable: "<gray>Chat moderation is temporarily unavailable; please try again.</gray>"
+  staff-blocked: "<dark_red>[JevGuard]</dark_red> <red>Blocked</red> <white><player></white><gray>:</gray> <white><message></white> <gray>(<category>, <probability> sure)</gray>"
+  staff-flag: "<dark_red>[JevGuard]</dark_red> <white><player></white> <gray>flagged</gray> <red><category></red> <gray>(<probability>):</gray> <white><message></white>"
+  staff-review: "<gold>[JevGuard]</gold> <white><player></white> <gray>needs review</gray> <yellow><category></yellow> <gray>(<probability>):</gray> <white><message></white>"

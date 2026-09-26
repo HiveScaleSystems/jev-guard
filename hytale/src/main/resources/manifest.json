@@ -1,0 +1,9 @@
+{
+  "Group": "JevGuard",
+  "Name": "JevGuard",
+  "Version": "${version}",
+  "Description": "AI chat moderation powered by TypeSafe's Jev model.",
+  "Authors": [ { "Name": "jev-guard contributors" } ],
+  "Main": "dev.jevguard.hytale.JevGuardHytalePlugin",
+  "ServerVersion": "*"
+}

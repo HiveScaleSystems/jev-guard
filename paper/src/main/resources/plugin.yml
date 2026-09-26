@@ -1,0 +1,16 @@
+name: jev-guard
+version: '${version}'
+main: dev.jevguard.paper.JevGuardPaperPlugin
+api-version: '26.2'
+folia-supported: true
+description: AI chat moderation for Paper servers, powered by TypeSafe's Jev model.
+permissions:
+  jevguard.admin:
+    description: Use /jevguard reload, status and test.
+    default: op
+  jevguard.notify:
+    description: Receive staff alerts for flagged and review-worthy messages.
+    default: op
+  jevguard.bypass:
+    description: Chat is not sent to Jev.
+    default: false
