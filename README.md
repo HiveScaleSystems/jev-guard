@@ -23,7 +23,7 @@ thresholds and actions in code. It batches messages into single API calls, so it
 ## Requirements
 
 - Minecraft: Paper (or Folia) 26.2+, Java 25
-- Hytale: a Hytale server (Java 25)
+- Hytale: server 0.6.8+ (Java 25)
 - One of:
   - A TypeSafe API key: [console.typesafe.ai](https://console.typesafe.ai)
   - A Cloudflare account, with an API token that has **Workers AI > Read** permission
@@ -109,12 +109,12 @@ hytale/  Hytale adapter: PlayerChatEvent (non-blocking), permissions, Message re
 ```
 
 ```sh
-./gradlew build                                              # core + paper
-./gradlew build -PhytaleServerJar=/path/to/HytaleServer.jar  # + hytale
+./gradlew build                                # core + paper + hytale, with unit tests
+./gradlew build -PhytaleVersion=0.7.0-pre.4    # build against a Hytale pre-release
 ```
 
-The Hytale server API isn't published to a Maven repository, so the `hytale` module builds only when you
-point it at a server jar, with `-PhytaleServerJar` or `HYTALE_SERVER_JAR`. Without one it is skipped.
+The Hytale server API comes from Hytale's Maven repository (`maven.hytale.com`). The default version is
+`hytaleVersion` in `gradle.properties`.
 
 Adding a platform means implementing four small interfaces from `core` (`Platform`, `ChatSender`,
 `Audience`, plus wiring the chat event and `/jevguard` command) and bundling `config.yml`.
@@ -128,11 +128,6 @@ git tag v0.2.0 && git push origin v0.2.0      # v0.2.0-beta.1 → pre-release
 ```
 
 You can also start it by hand from **Actions → release → Run workflow**.
-
-The Hytale jar needs the repository secret `HYTALE_SOURCE_TOKEN`: a fine-grained token with
-read-only **Contents** access to `HypixelStudios/hytale-shared-source`. CI uses it to build
-`HytaleServer.jar`, compiles against it, and never publishes it. Without the secret, the release
-ships the Paper jar only.
 
 ## License
 

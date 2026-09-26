@@ -2,19 +2,23 @@ plugins {
     id("com.gradleup.shadow")
 }
 
-val hytaleServerJar = files(gradle.extra["hytaleServerJar"] as String)
+val hytaleVersion = providers.gradleProperty("hytaleVersion").get()
+
+repositories {
+    maven(if ("-pre" in hytaleVersion) "https://maven.hytale.com/pre-release" else "https://maven.hytale.com/release")
+}
 
 dependencies {
     implementation(project(":core"))
     // Hytale doesn't ship SnakeYAML; bundle it (relocated below). Gson comes from the server.
     implementation("org.yaml:snakeyaml:2.6")
-    compileOnly(hytaleServerJar)
+    compileOnly("com.hypixel.hytale:Server:$hytaleVersion")
     compileOnly("com.google.code.gson:gson:2.13.2")
 
     testImplementation(platform("org.junit:junit-bom:5.13.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation(hytaleServerJar)
+    testImplementation("com.hypixel.hytale:Server:$hytaleVersion")
 }
 
 tasks.processResources {

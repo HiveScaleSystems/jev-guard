@@ -18,4 +18,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: jev-guard
-          path: "*/build/libs/*.jar"
+          path: |
+            paper/build/libs/*.jar
+            hytale/build/libs/*.jar
