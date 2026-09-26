@@ -119,6 +119,21 @@ point it at a server jar, with `-PhytaleServerJar` or `HYTALE_SERVER_JAR`. Witho
 Adding a platform means implementing four small interfaces from `core` (`Platform`, `ChatSender`,
 `Audience`, plus wiring the chat event and `/jevguard` command) and bundling `config.yml`.
 
+## Releasing
+
+Push a version tag and the `release` workflow builds both jars and publishes a GitHub Release:
+
+```sh
+git tag v0.2.0 && git push origin v0.2.0      # v0.2.0-beta.1 → pre-release
+```
+
+You can also start it by hand from **Actions → release → Run workflow**.
+
+The Hytale jar needs the repository secret `HYTALE_SOURCE_TOKEN`: a fine-grained token with
+read-only **Contents** access to `HypixelStudios/hytale-shared-source`. CI uses it to build
+`HytaleServer.jar`, compiles against it, and never publishes it. Without the secret, the release
+ships the Paper jar only.
+
 ## License
 
 MIT
