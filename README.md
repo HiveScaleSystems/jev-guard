@@ -18,6 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/HiveScaleSystems/jev-guard/releases/latest"><b>Download</b></a> ·
+  <a href="https://jev-guard.beehivesys.net">Website</a> ·
   <a href="#install">Install</a> ·
   <a href="#commands-and-permissions">Commands</a> ·
   <a href="#how-it-works">How it works</a>
