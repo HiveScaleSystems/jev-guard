@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/HiveScaleSystems/jev-guard/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/HiveScaleSystems/jev-guard?color=059669"></a>
+  <a href="https://github.com/HiveScaleSystems/jev-guard/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/HiveScaleSystems/jev-guard?color=2f6bff"></a>
   <a href="https://github.com/HiveScaleSystems/jev-guard/actions/workflows/build.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/HiveScaleSystems/jev-guard/build.yml?branch=main"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/github/license/HiveScaleSystems/jev-guard"></a>
 </p>
